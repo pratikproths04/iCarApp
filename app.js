@@ -8,7 +8,7 @@ var express = require('express')
   , user = require('./routes/user')
   , http = require('http')
   , path = require('path');
-
+var util = require('util');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var methodOverride = require('method-override');
@@ -18,40 +18,53 @@ var errorHandler = require('errorhandler');
 var app = express();
 
 //Put your skyscanner api key here
-var api_key = "sa959583952162241927741272970024";
+const apiKey = "sa959583952162241927741272970024";
 
-var baseURI = 'http://partners.api.skyscanner.net/apiservices/carhire/'; 
-var browse = baseURI + 'liveprices/v2/';
+var baseURI = 'http://partners.api.skyscanner.net/apiservices/'; 
+var browse_pricing = baseURI + 'pricing/v1.0';
+var browse_reference = baseURI + 'reference/v1.0';
 
-app.get('/getPrice', function (req, res) {
-	var market = (req.param("country")) ? req.param("country") : 'US';
+app.get('/getPrice/:pickupplace/:dropoffplace/:pickupdate/:pickuptime/:driverage', function (req, res) {
+	console.log("Inside getPrice: ");
+	var params = req.params;
+	console.log("params: "+JSON.stringify(params));
+	var market = (params.country) ? params.country : 'UK';
 	console.log("market: "+market);
-	var currency = (req.param("currency")) ? req.param("currency") : 'USD';
+	var currency = (params.currency) ? params.currency : 'GBP';
 	console.log("currency: "+currency);
-	var locale = (req.param("language")) ? req.param("language") : 'en-us';
+	var locale = (params.language) ? params.language : 'en-GB';
 	console.log("locale: "+locale);
-	var pickupplace = (req.param("pickupplace"));
+	var pickupplace = params.pickupplace;
 	console.log("pickupplace: "+pickupplace);
-	var dropoffplace = req.param("dropoffplace");
+	var dropoffplace = params.dropoffplace;
 	console.log("dropoffplace: "+dropoffplace);
-	var pickupdate = req.param("pickupdate");
+	var pickupdate = params.pickupdate;
 	console.log("pickupdate: "+pickupdate);
-	var pickuptime = req.param("pickuptime");
+	var pickuptime = params.pickuptime;
 	console.log("pickuptime: "+pickuptime);
 	var pickupdatetime = pickupdate+"T"+pickuptime;
 	console.log("pickupdatetime: "+pickupdatetime);
+	var ip = "127.0.0.1";
 	/*var dropoffdatetime = req.param("dropoffdatetime");
 	console.log("dropoffdatetime: "+dropoffdatetime);*/
-	var driverage = req.param("driverage");
+	var driverage = params.driverage;
 	console.log("driverage: "+driverage);
 	
-	var options = {
-	  host: browse,
-	  path: '/'+market+'/'+currency+'/'+locale+'/'+pickupplace+'/'
-	  		+dropoffplace+'/'+pickupdatetime+'/'+driverage+'/'+api_key 
-	};
 	var body;
-	var req = http.get(options, function(res) {
+	var browse_reference_url = util.format(
+			browse_reference+'/locales?apiKey=%s',
+            apiKey);
+	
+	var browse_pricing_url = util.format(
+			browse_pricing+'/US/USD/en-US/'+'%s/%s/%s/%s?apiKey=%s',
+            encodeURIComponent(pickupplace),
+            encodeURIComponent(dropoffplace),
+            encodeURIComponent(pickupdatetime),
+            encodeURIComponent(driverage),
+            apiKey);
+	
+	
+	var req = http.get(browse_pricing_url, function(res) {
 	  console.log('STATUS: ' + res.statusCode);
 	  console.log('HEADERS: ' + JSON.stringify(res.headers));
 
