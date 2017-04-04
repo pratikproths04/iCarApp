@@ -38,18 +38,19 @@ app.get('/getPrice', function (req, res) {
 	console.log("pickupdate: "+pickupdate);
 	var pickuptime = req.param("pickuptime");
 	console.log("pickuptime: "+pickuptime);
-	var pickupdatetime = new Date(pickupdate+' '+pickuptime);
+	var pickupdatetime = pickupdate+"T"+pickuptime;
+	console.log("pickupdatetime: "+pickupdatetime);
 	/*var dropoffdatetime = req.param("dropoffdatetime");
-	console.log("dropoffdatetime: "+dropoffdatetime);
+	console.log("dropoffdatetime: "+dropoffdatetime);*/
 	var driverage = req.param("driverage");
-	console.log("driverage: "+driverage);*/
+	console.log("driverage: "+driverage);
 	
 	var options = {
 	  host: browse,
 	  path: '/'+market+'/'+currency+'/'+locale+'/'+pickupplace+'/'
-	  		+dropoffplace+'/'+pickupdatetime
+	  		+dropoffplace+'/'+pickupdatetime+'/'+driverage+'/'+api_key 
 	};
-	
+	var body;
 	var req = http.get(options, function(res) {
 	  console.log('STATUS: ' + res.statusCode);
 	  console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -62,12 +63,8 @@ app.get('/getPrice', function (req, res) {
 	    bodyChunks.push(chunk);
 	  }).on('end', function() {
 		console.log('bodyChunks: ' + bodyChunks);
-	    var body = Buffer.concat(bodyChunks);
+	    body = Buffer.concat(bodyChunks);
 	    console.log('BODY: ' + body);
-	    if(body!= null){
-	    	res.send({status: "success", "data":body});
-	    }
-	    res.send({status: "fail", "data":body});
 	    // ...and/or process the entire body here.
 	  })
 	});
@@ -75,6 +72,11 @@ app.get('/getPrice', function (req, res) {
 	req.on('error', function(e) {
 	  console.log('ERROR: ' + e.message);
 	});
+	
+	if(body!= null)
+    	res.send({status: "success", "data":body});
+    res.send({status: "fail", "data":body});
+	
 });
 
 // all environments
