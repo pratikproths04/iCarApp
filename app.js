@@ -34,8 +34,11 @@ app.get('/getPrice', function (req, res) {
 	console.log("pickupplace: "+pickupplace);
 	var dropoffplace = req.param("dropoffplace");
 	console.log("dropoffplace: "+dropoffplace);
-	var pickupdatetime = req.param("pickupdatetime");
-	console.log("pickupdatetime: "+pickupdatetime);
+	var pickupdate = req.param("pickupdate");
+	console.log("pickupdate: "+pickupdate);
+	var pickuptime = req.param("pickuptime");
+	console.log("pickuptime: "+pickuptime);
+	var pickupdatetime = new Date(pickupdate+' '+pickuptime);
 	/*var dropoffdatetime = req.param("dropoffdatetime");
 	console.log("dropoffdatetime: "+dropoffdatetime);
 	var driverage = req.param("driverage");
